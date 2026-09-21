@@ -4,6 +4,7 @@ import Home from './pages/Home.jsx';
 import Students from './pages/Students.jsx';
 import Courses from './pages/Courses.jsx';
 import About from './pages/About.jsx';
+import PortalMascot from './components/PortalMascot.jsx';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="/about" element={<About />} />
           </Routes>
         </main>
+        <PortalMascot />
       </div>
     </Router>
   );
