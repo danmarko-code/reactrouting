@@ -28,7 +28,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Atmospheric Ambient Glowing Orbs for Glassmorphism */
+/* Atmospheric Glowing Ambient Orbs */
 body::before,
 body::after {
   content: '';
@@ -130,7 +130,7 @@ body::after {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* Content Container & Animations */
+/* Layout & Page Container */
 .content {
   flex: 1;
 }
@@ -669,107 +669,261 @@ body::after {
     grid-template-columns: 1fr;
   }
 }
-/* Interactive Eye-Tracking Mascot */
+
+/* =======================================================
+   MASCOT BASE & DRAGGING / EYE-TRACKING PHYSICS
+   ======================================================= */
 .mascot-container {
   position: fixed;
-  bottom: 24px;
-  right: 28px;
-  z-index: 99;
+  bottom: 32px;
+  right: 36px;
+  z-index: 999;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  cursor: pointer;
+  align-items: center;
+  cursor: grab;
   user-select: none;
-  animation: mascotFloat 4s ease-in-out infinite alternate;
+  touch-action: none;
+}
+
+/* Floating animation when idle */
+.mascot-container:not(.is-dragging):not(.is-returning) {
+  animation: mascotFloat 3.5s ease-in-out infinite alternate;
 }
 
 @keyframes mascotFloat {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-8px); }
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-10px); }
+}
+
+/* While being held/dragged */
+.mascot-container.is-dragging {
+  cursor: grabbing !important;
+  z-index: 1000;
+  transition: none;
+}
+
+.mascot-container.is-dragging .mascot-body {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 26px 52px rgba(15, 23, 42, 0.32);
+}
+
+/* 3-Second Snap Back (Bouncy Spring Transition) */
+.mascot-container.is-returning {
+  transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mascot-container.is-returning .mascot-body {
+  animation: wobble 0.85s ease;
+}
+
+@keyframes wobble {
+  0% { transform: scale(1.1) rotate(-8deg); }
+  50% { transform: scale(0.95) rotate(5deg); }
+  75% { transform: scale(1.04) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0); }
 }
 
 /* Speech Tooltip */
 .mascot-speech-bubble {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  padding: 0.45rem 0.85rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #0f172a;
-  margin-bottom: 0.5rem;
-  white-space: nowrap;
-  animation: fadeIn 0.3s ease;
-}
-
-/* Glass Robot Body */
-.mascot-body {
-  width: 72px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1.5px solid rgba(255, 255, 255, 0.95);
-  border-radius: 22px 22px 16px 16px;
-  box-shadow: 0 10px 30px rgba(31, 38, 135, 0.12);
+  padding: 0.6rem 1.1rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.65rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* Cute Head Antenna */
+.mascot-antenna {
+  width: 4px;
+  height: 12px;
+  background: #cbd5e1;
+  position: absolute;
+  top: -12px;
+  border-radius: 4px;
+}
+
+.mascot-antenna::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+/* Large Glass Robot Body */
+.mascot-body {
+  width: 110px;
+  height: 98px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 32px 32px 24px 24px;
+  box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 10px;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
 .mascot-container:hover .mascot-body {
   transform: scale(1.08);
+  box-shadow: 0 20px 48px rgba(31, 38, 135, 0.22);
 }
 
-/* Face & Moving Eyes */
+/* Large Eyes & Moving Pupils */
 .mascot-face {
   display: flex;
-  gap: 12px;
+  gap: 16px;
 }
 
 .mascot-eye {
-  width: 18px;
-  height: 22px;
+  width: 28px;
+  height: 34px;
   background: #ffffff;
   border-radius: 50%;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.18);
   overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .mascot-pupil {
-  width: 9px;
-  height: 9px;
+  width: 14px;
+  height: 14px;
   background: #0f172a;
   border-radius: 50%;
   position: absolute;
-  transition: transform 0.05s ease-out; /* Smooth tracking lag */
+  transition: transform 0.05s ease-out;
 }
 
-/* Little Highlight Dot in Pupil */
 .mascot-pupil::after {
   content: '';
   position: absolute;
-  top: 1.5px;
-  left: 2px;
-  width: 2.5px;
-  height: 2.5px;
+  top: 2px;
+  left: 3px;
+  width: 4px;
+  height: 4px;
   background: #ffffff;
   border-radius: 50%;
 }
 
+/* Default Mouth */
 .mascot-mouth {
-  width: 10px;
-  height: 4px;
-  border-bottom: 2px solid #64748b;
-  border-radius: 0 0 10px 10px;
+  width: 16px;
+  height: 6px;
+  border-bottom: 3px solid #64748b;
+  border-radius: 0 0 14px 14px;
+}
+
+/* Cheeks */
+.mascot-cheeks {
+  position: absolute;
+  width: 78px;
+  display: flex;
+  justify-content: space-between;
+  top: 52px;
+  pointer-events: none;
+}
+
+.cheek {
+  width: 12px;
+  height: 6px;
+  background: rgba(244, 114, 182, 0.45);
+  border-radius: 50%;
+  filter: blur(1px);
+  transition: all 0.3s ease;
+}
+
+/* =======================================================
+   DYNAMIC MASCOT EXPRESSIONS
+   ======================================================= */
+/* HAPPY (^ _ ^) */
+.expr-happy .mascot-eye {
+  height: 14px;
+  border-radius: 18px 18px 0 0;
+  border-bottom: 4px solid #0f172a;
+  background: transparent;
+  box-shadow: none;
+  border-top: none;
+}
+
+.expr-happy .mascot-pupil {
+  display: none;
+}
+
+.expr-happy .mascot-mouth {
+  width: 18px;
+  height: 10px;
+  background: #e11d48;
+  border: none;
+  border-radius: 0 0 16px 16px;
+  transition: all 0.25s ease;
+}
+
+.expr-happy .cheek {
+  transform: scale(1.4);
+  background: rgba(244, 114, 182, 0.85);
+}
+
+/* SURPRISED (O _ O) */
+.expr-surprised .mascot-eye {
+  width: 32px;
+  height: 38px;
+  transform: scale(1.15);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expr-surprised .mascot-pupil {
+  width: 8px;
+  height: 8px;
+}
+
+.expr-surprised .mascot-mouth {
+  width: 12px;
+  height: 14px;
+  background: #0f172a;
+  border: none;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+/* WINK (; _ ^) */
+.expr-wink .right-eye {
+  height: 6px;
+  border-radius: 0;
+  border-bottom: 4px solid #0f172a;
+  background: transparent;
+  box-shadow: none;
+  margin-top: 14px;
+}
+
+.expr-wink .right-eye .mascot-pupil {
+  display: none;
+}
+
+.expr-wink .mascot-mouth {
+  width: 14px;
+  height: 6px;
+  transform: rotate(-6deg);
+  border-bottom: 3px solid #0f172a;
 }
